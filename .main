@@ -173,20 +173,21 @@ void brisanje(queue *Q){
 		}
 		else EnQueueQ(x,Q);
 	}
+        cout<<"[CEKAONICA]"<<endl;
 	stanje(Q);
 } 
+void prebaci(queue *Q,queue *brzi){
+	if(IsEmptyQ(Q)) return;
+	zapis x = FrontQ(Q);
+	DeQueueQ(Q);
+	prebaci(Q,brzi);
+	if(x.di==3 || x.di==4) EnQueueQ(x,brzi);
+	else EnQueueQ(x,Q);
+}
 void brzi_red(queue *Q){
 	if(IsEmptyQ(Q)) return;
 	queue *brzi = InitQ(brzi);
-	zapis x;
-	x = FrontQ(Q);
-	DeQueueQ(Q);
-	brzi_red(Q);
-	if(x.di==3 || x.di==4){
-		EnQueueQ(x,brzi);
-	}
-	EnQueueQ(x,Q);
-	
+        prebaci(Q,brzi);
 	cout<<"[Otvoren je red za brze usluge]"<<endl<<endl;
 	cout<<"--------------------------------"<<endl;
 	stanje(brzi);
