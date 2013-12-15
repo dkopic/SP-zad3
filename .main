@@ -109,12 +109,11 @@ void poslozi(queue *Q){
 	for(int i=1;i<=5;i++){
 		while(IsEmptyQ(Q)==false){
 			x = FrontQ(Q);
+			DeQueueQ(Q);
 			if(x.ci == i)
 			EnQueueQ(x,pom);
-			else{
+			else
 			EnQueueQ(x,pom2);
-		}
-			DeQueueQ(Q);
 		}
 		while(IsEmptyQ(pom2)==false){
 			x = FrontQ(pom2);
@@ -222,3 +221,4 @@ int main(){
 	
 	return 0;
 }
+
