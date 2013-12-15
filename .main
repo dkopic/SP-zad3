@@ -1,0 +1,224 @@
+#include <iostream>
+#include <cstring>
+#include <ctime>
+#include <cstdlib>
+#include "red_pokazivac.h"
+//#include "red_polje.h"
+using namespace std;
+
+struct petorke{
+	int ai,bi,ci,di,ei;
+};
+petorke *niz = NULL;
+int brz=0;
+void generiraj(int n){
+	if(niz) delete[] niz;
+	rand();
+	if(n==0) return;
+	niz = new petorke[n];
+	for(int i=0;i<n;i++){
+		do{
+		niz[i].ai = rand()%250+50; //vremenske jedinice - dolazak u cekaonicu
+		niz[i].bi = rand()%250+50; //vremenske jedinice - boravak u ordinaciji
+		niz[i].ci = rand()%5+1; //prioritet pacijenta
+		niz[i].di = rand()%4+1; //vrsta usluge
+		niz[i].ei = rand()%5+1; //vrsta ordinacije
+		cout<<"------------------------------"<<endl;
+		cout<<"Prioritet:  ";
+		if(niz[i].ci==1) cout<<"Hitan slucaj!"<<endl;
+		else if(niz[i].ci==2) cout<<"Invalid."<<endl;
+		else if(niz[i].ci==3) cout<<"Trudnica."<<endl;
+		else if(niz[i].ci==4) cout<<"Dijete 4-6 god."<<endl;
+		else cout<<"Pacijent ne spada pod bitne slucajeve."<<endl;
+		
+		cout<<"Vrsta usluge:  ";
+		if(niz[i].di==1) cout<<"Pregled pacijenta."<<endl;
+		else if(niz[i].di==2) cout<<"Previjanje pacijenta."<<endl;
+		else if(niz[i].di==3) cout<<"Recept za pacijenta."<<endl;
+		else cout<<"Uputnica za pacijenta."<<endl;
+		
+		cout<<"Vrsta ordinacije:  ";
+		if(niz[i].ei==1) cout<<"Obiteljska medicina."<<endl;
+		else if(niz[i].ei==2) cout<<"Oftamologija."<<endl;
+		else if(niz[i].ei==3) cout<<"Dermatovenerologija."<<endl;
+		else if(niz[i].ei==4) cout<<"Ginekologija."<<endl;
+		else cout<<"Urologija."<<endl;
+		cout<<"Pacijent je zaprimljen..."<<endl;
+		}while((niz[i].ci==3 && niz[i].ei==5) || (niz[i].ci==1 && niz[i].ei==1) 
+		      || (niz[i].ci==1 && niz[i].di==2 && niz[i].di==4));
+	}
+}
+//ispis svih pacijenata
+void stanje(queue *Q){
+	if(IsEmptyQ(Q)) return;
+	zapis x;
+	queue *pom = InitQ(pom);
+	cout<<"[Stanje u cekaonici]:\n------------------"<<endl;
+	while(IsEmptyQ(Q)==false){
+		x = FrontQ(Q);
+		cout<<x.ime<<" "<<x.prezime<<" "<<x.d<<"."<<x.m<<"."<<x.g<<"."<<" "<<x.spol<<endl
+		    <<"Prioritet:"<<x.ci<<endl
+		    <<"Usluga:"<<x.di<<endl
+		    <<"Ordinacija:"<<x.ei<<endl
+		    <<"Vrijeme provedeno u cekaonici:"<<x.ai<<endl
+		    <<"Vrijeme provedeno u ordinaciji:"<<x.bi<<" min."<<endl<<"------------------"<<endl;
+		EnQueueQ(x,pom);
+		DeQueueQ(Q);
+		}
+	while(IsEmptyQ(pom)==false){
+		x = FrontQ(pom);
+		EnQueueQ(x,Q);
+		DeQueueQ(pom);
+	}
+	delete pom;
+}
+//ispis pacijentica starijih od 25 koje idu kod oftamologa
+void ispis(queue *Q){
+	if(IsEmptyQ(Q)){
+		cout<<"Red je prazan!"<<endl;
+		return;
+	}
+	zapis x;
+	queue *pom = InitQ(pom);
+	cout<<"Slijedece pacijentice idu na pregled kod oftamologa (starije od 25 god):\n------------------"<<endl;
+	while(IsEmptyQ(Q)==false){
+		x = FrontQ(Q);
+		EnQueueQ(x,pom);
+		DeQueueQ(Q);
+	}
+	while(IsEmptyQ(pom)==false){
+		x = FrontQ(pom);
+			if(x.ei==2 && x.g<1988 && x.spol=='z'){
+			cout<<x.ime<<" "<<x.prezime<<" "<<x.d<<"."<<x.m<<"."<<x.g<<"."<<" "<<x.spol<<endl
+		    <<"Prioritet:"<<x.ci<<endl
+		    <<"Usluga:"<<x.di<<endl
+		    <<"Ordinacija:"<<x.ei<<endl
+		    <<"Vrijeme provedeno u cekaonici:"<<x.ai<<endl
+		    <<"Vrijeme provedeno u ordinaciji:"<<x.bi<<" min."<<endl<<"------------------"<<endl;
+		}
+		EnQueueQ(x,Q);
+		DeQueueQ(pom);
+	}
+	delete pom;
+}
+
+void poslozi(queue *Q){
+	zapis x;
+	queue *pom = InitQ(pom);
+	queue *pom2 = InitQ(pom2);
+	for(int i=1;i<=5;i++){
+		while(IsEmptyQ(Q)==false){
+			x = FrontQ(Q);
+			if(x.ci == i)
+			EnQueueQ(x,pom);
+			else{
+			EnQueueQ(x,pom2);
+		}
+			DeQueueQ(Q);
+		}
+		while(IsEmptyQ(pom2)==false){
+			x = FrontQ(pom2);
+			EnQueueQ(x,Q);
+			DeQueueQ(pom2);
+		}
+	}
+	while(IsEmptyQ(pom)==false){
+		x = FrontQ(pom);
+		EnQueueQ(x,Q);
+		DeQueueQ(pom);
+	}
+	delete pom;
+	delete pom2;
+}
+//upis pacijenata u glavni red
+void upis(queue *Q,int n){
+	cout<<"[SALTER] Upis pacijenata u red.\n------------------"<<endl;
+	zapis x;
+	for(int i=0;i<n;i++)
+		for(int j=0;j<3;j++){
+		    cout<<"Ime i prezime:";cin>>x.ime>>x.prezime;
+		    cout<<"Datum rodenja:";cin>>x.d>>x.m>>x.g;
+			cout<<"Spol:";cin>>x.spol;
+			x.ai = niz[i].ai;
+			x.bi = niz[i].bi;
+			x.ci = niz[i].ci;
+			x.di = niz[i].di;
+			x.ei = niz[i].ei;
+			EnQueueQ(x,Q);
+			brz++;
+		}
+	//posluzivanje pacijenata prema redoslijedu
+	poslozi(Q);
+	stanje(Q);
+	ispis(Q);
+}
+void brisanje(queue *Q){
+	if(IsEmptyQ(Q)) return;
+	zapis x;
+	queue *pom = InitQ(pom);
+	cout<<"Slijedeci pacijenti izlaze iz cekaonice:\n------------------"<<endl;
+	while(IsEmptyQ(Q)==false){
+		x = FrontQ(Q);
+		EnQueueQ(x,pom);
+		DeQueueQ(Q);
+		}
+	while(IsEmptyQ(pom)==false){
+		x = FrontQ(pom);
+		DeQueueQ(pom);
+		if(x.ci==2 && x.g<1963 && x.ei==1 && x.di==2){
+			cout<<x.ime<<" "<<x.prezime<<" "<<x.d<<"."<<x.m<<"."<<x.g<<"."<<" "<<x.spol<<endl
+		    <<"Prioritet:"<<x.ci<<endl
+		    <<"Usluga:"<<x.di<<endl
+		    <<"Ordinacija:"<<x.ei<<endl;
+		    brz--;
+		}
+		else EnQueueQ(x,Q);
+	}
+	stanje(Q);
+} 
+void brzi_red(queue *Q){
+	if(IsEmptyQ(Q)) return;
+	queue *brzi = InitQ(brzi);
+	zapis x;
+	x = FrontQ(Q);
+	DeQueueQ(Q);
+	brzi_red(Q);
+	if(x.di==3 || x.di==4){
+		EnQueueQ(x,brzi);
+	}
+	EnQueueQ(x,Q);
+	
+	cout<<"[Otvoren je red za brze usluge]"<<endl<<endl;
+	cout<<"--------------------------------"<<endl;
+	stanje(brzi);
+	poslozi(Q);
+	stanje(Q);
+}
+
+int main(){
+	queue *Q = InitQ(Q);
+	srand(time(0));
+	rand();
+    int x,n=0;
+	do{
+		cout<<"-------- Izbornik ----------"<<endl;
+		cout<<"1. Generiranje petorki."<<endl;
+		cout<<"2. Dodavanje zapisa o pacijentima\nPosluzivanje pacijenata prema redoslijedu\nIspis pacijentica starijih od 25 godina koje idu na pregled kod oftamologa"<<endl;
+		cout<<"3. Brisanje invalida iz cekaonice."<<endl;
+		cout<<"4. Otvaranje reda brzih usluga."<<endl;
+		cout<<"9. Izlaz."<<endl;
+		cout<<"Izbor:";
+		cin>>x;
+	    
+	    switch(x){
+	    	case 1: cout<<"Unesi broj zapisa:";cin>>n;
+			        generiraj(n);break;
+	        case 2: upis(Q,n);break;
+	        case 3: brisanje(Q);break;
+	        case 4: brzi_red(Q);break;
+	    	default:break;
+	        }
+	}while(x!=9);
+	
+	return 0;
+}
