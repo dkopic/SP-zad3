@@ -60,7 +60,7 @@ void stanje(queue *Q){
 		    <<"Prioritet:"<<x.ci<<endl
 		    <<"Usluga:"<<x.di<<endl
 		    <<"Ordinacija:"<<x.ei<<endl
-		    <<"Vrijeme provedeno u cekaonici:"<<x.ai<<endl
+		    <<"Vrijeme provedeno u cekaonici:"<<x.ai<<"min."<<endl
 		    <<"Vrijeme provedeno u ordinaciji:"<<x.bi<<" min."<<endl<<"------------------"<<endl;
 		EnQueueQ(x,pom);
 		DeQueueQ(Q);
